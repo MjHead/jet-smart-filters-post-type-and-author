@@ -31,7 +31,7 @@ class Jet_SF_Post_Type_Author {
 	 * @return array
 	 */
 	public function register_filter_query_vars( $vars ) {
-		array_unshift( $vars, 'post_type', 'author' );
+		array_unshift( $vars, 'post_type', 'author', 'author_name' );
 		return $vars;
 	}
 
@@ -57,7 +57,7 @@ class Jet_SF_Post_Type_Author {
 	 */
 	public function clear_meta_query( $row ) {
 
-		if ( in_array( $row['key'], array( 'author', 'post_type' ) ) ) {
+		if ( in_array( $row['key'], array( 'author', 'author_name', 'post_type' ) ) ) {
 			$row = array();
 		}
 
