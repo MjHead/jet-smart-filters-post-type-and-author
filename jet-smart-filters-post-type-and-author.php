@@ -22,6 +22,28 @@ class Jet_SF_Post_Type_Author {
 		add_filter( 'jet-smart-filters/query/vars', array( $this, 'register_filter_query_vars' ) );
 		add_filter( 'jet-smart-filters/query/add-var', array( $this, 'process_filter_query_vars' ), 10, 4 );
 		add_filter( 'jet-smart-filters/query/meta-query-row', array( $this, 'clear_meta_query' ) );
+		add_filter( 'jet-smart-filters/query/final-query', array( $this, 'maybe_fix_value' ) );
+	}
+
+	/**
+	 * Fix post__in variable value for Checkbox Filter
+	 * post__in parameter in WP_Query should be an array of post IDs
+	 *
+	 * @param  array $query parameters passed to WP_Query by filters
+	 * @return array
+	 */
+	public function maybe_fix_value( $query ) {
+
+		if ( empty( $query['post__in'] ) ) {
+			return $query;
+		}
+
+		if ( ! is_array( $query['post__in'] ) ) {
+			$query['post__in'] = array( $query['post__in'] );
+		}
+
+		return $query;
+
 	}
 
 	/**
@@ -31,7 +53,7 @@ class Jet_SF_Post_Type_Author {
 	 * @return array
 	 */
 	public function register_filter_query_vars( $vars ) {
-		array_unshift( $vars, 'post_type', 'author', 'author_name' );
+		array_unshift( $vars, 'post_type', 'author', 'author_name', 'post__in' );
 		return $vars;
 	}
 
@@ -57,7 +79,7 @@ class Jet_SF_Post_Type_Author {
 	 */
 	public function clear_meta_query( $row ) {
 
-		if ( in_array( $row['key'], array( 'author', 'author_name', 'post_type' ) ) ) {
+		if ( in_array( $row['key'], array( 'author', 'author_name', 'post_type', 'post__in' ) ) ) {
 			$row = array();
 		}
 
